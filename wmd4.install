@@ -111,7 +111,8 @@ function wmd4_install() {
 }
 
 function _wmd4_get_uid_array() {
-    $result = db_query("SELECT uid FROM {authmap} WHERE module = '%s'",'wmd4');
+    $result = db_query("SELECT uid FROM {authmap} WHERE module = :module",
+        array(':module'=>'wmd4'));
     $uid_array = array();
     foreach ($result as $row) {
 	$uid_array[] = $row->uid;
