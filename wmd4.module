@@ -27,30 +27,43 @@ function wmd4_boot() {
     // if we have a logged-in user, check for validity
     if (isset($user) && $user->uid > 0) {
         $q_login = _wmd4_login_q();
-	// thwart an authenticated user who is trying to run the login routine
+	    // thwart an authenticated user who is trying to run the login routine
         if (isset($_REQUEST['q']) && $_REQUEST['q'] == $q_login) {
-	    drupal_set_message('User is already logged in.');
-	    $_REQUEST['q'] = variable_get('site_403','');
-	} else {	 
+	        drupal_set_message('User is already logged in.');
+	        $_REQUEST['q'] = variable_get('site_403','');
+	    } else {
             // see if user is SUNET 
-	    $sunetid = db_query("SELECT authname FROM {authmap} WHERE uid = :uid and module = :module",array(':uid'=>$user->uid,':module'=>'wmd4'))->fetchField();
-	    if ($sunetid !== FALSE) {
-	        // make sure our SUNET user's id matches WEBAUTH_USER; log out user if mismatch
-	        if (empty($_SERVER['WEBAUTH_USER']) || $sunetid != $_SERVER['WEBAUTH_USER']) {
-	            _wmd4_user_logout();
-		} else {
+	        $sunetid = db_query("SELECT authname FROM {authmap} WHERE uid = :uid and module = :module",array(':uid'=>$user->uid,':module'=>'wmd4'))->fetchField();
+	        if ($sunetid !== FALSE) {
+	            // make sure our SUNET user's id matches WEBAUTH_USER; log out user if mismatch
+	            if (empty($_SERVER['WEBAUTH_USER']) || $sunetid != $_SERVER['WEBAUTH_USER']) {
+	                _wmd4_user_logout();
+		        } else {
                     // SUNET user id okay; check if we need to reverify user and groups
                     if (_wmd4_interval_check()) {
                         $groups = _wmd4_check_access_and_groups();
                         if ($groups === FALSE) {
                             _wmd4_user_logout();
                         } else {
-			    // we want to update groups in hook_init
-			    $_SESSION['wmd4_update_groups'] = $groups;
+			                // we want to update groups in hook_init
+			                $_SESSION['wmd4_update_groups'] = $groups;
                         }
-		    }
-		}
-	    }
+		            }
+		        }
+	        }
+        }
+    } else {
+        if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form_id'] == 'user_login') {
+            $allowed_in = explode("\n",chop(variable_get('wmd4_allowed_local_accounts','')));
+            $allowed = array();
+            foreach($allowed_in as $name) {
+                $allowed[] = chop($name);
+            }
+            if (empty($_POST['name']) || !in_array($_POST['name'],$allowed)) {
+                header('HTTP/1.0 403 Forbidden');
+                print('please login via webauth');
+                exit;
+            }
         }
     }
 }

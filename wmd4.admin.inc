@@ -213,6 +213,13 @@ function wmd4_admin_users($form_state) {
     '#default_value' => variable_get('wmd4_require_privgroups', ''),
   );
 
+  $form['wmd4_allowed_local_accounts'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Drupal accounts allowed non-webauthed logins'),
+    '#description' => t('Enter one account name per line'),
+    '#default_value' => variable_get('wmd4_allowed_local_accounts',''),
+  );
+
   $form = system_settings_form($form);
 
   $form['#validate'][] = 'wmd4_admin_users_validate';
@@ -233,6 +240,7 @@ function wmd4_admin_users_validate($form, &$form_state) {
 
   $userlines = explode("\n", chop($form_state['values']['wmd4_require_users']));
   $grouplines = explode("\n", chop($form_state['values']['wmd4_require_privgroups']));
+  $localaccounts = explode("\n",chop($form_state['values']['wmd4_allowed_local_accounts']));
 
   foreach($userlines as $line) {
     $line = chop($line);
@@ -246,6 +254,12 @@ function wmd4_admin_users_validate($form, &$form_state) {
       form_set_error('wmd4_require_privgroups', t('!line is not a valid user format. Please enter one username per line.', array('!line' => $line)));
     }
   }
+    foreach($localaccounts as $line) {
+        $line = chop($line);
+        if ($line != '' && preg_match("/^[\w\d-_]+$/", $line) != 1) {
+            form_set_error('wmd4_allowed_local_accounts', t('!line is not a valid user format. Please enter one username per line.', array('!line' => $line)));
+        }
+    }
 
   if (trim($form_state['values']['wmd4_require_users']) == '' && trim($form_state['values']['wmd4_require_privgroups']) == '' && $form_state['values']['wmd4_require_valid_user'] == FALSE) {
     form_set_error('wmd4_require_valid_user', t('You must specify some valid means for accessing the site.'));
