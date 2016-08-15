@@ -53,7 +53,7 @@ function wmd4_boot() {
 	        }
         }
     } else {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form_id'] == 'user_login') {
+        if ((!empty($_SERVER['REQUEST_METHOD']) && !empty($_POST['form_id'])) && ($_SERVER['REQUEST_METHOD'] == 'POST' && $_POST['form_id'] == 'user_login')) {
             $allowed_in = explode("\n",chop(variable_get('wmd4_allowed_local_accounts','')));
             $allowed = array();
             foreach($allowed_in as $name) {
