@@ -107,15 +107,8 @@ function wmd4_install() {
     $wa_glob = glob($old_wmd_path.'/*');
     if (!empty($wa_glob)) array_map("unlink", $wa_glob);
     @rmdir($old_wmd_path);
-
-    // set up redirect path for any webauthed user without also having a drupal acct
-    _wmd4_setup_any_webauth();
 }
 
-function wmd4_update_7406() {
-    _wmd4_setup_any_webauth();
-}
- 
 function _wmd4_get_uid_array() {
     $result = db_query("SELECT uid FROM {authmap} WHERE module = :module",
         array(':module'=>'wmd4'));
@@ -471,30 +464,4 @@ function wmd4_requirements($phase) {
 
     return $requirements;
     }
-}
-
-function _wmd4_setup_any_webauth() {
-
-  // Get the path or create it inside the files dir.
-  $any_webauth_path = substr($_SERVER['SCRIPT_FILENAME'],0,strpos($_SERVER['SCRIPT_FILENAME'],'index.php')) . conf_path() . '/anywebauth';
-
-  // Set .htaccess file location
-  $any_webauth_htaccess = $any_webauth_path . '/.htaccess';
-
-  // If any_webauth dir doesn't exist yet, create it.
-  if (@is_dir($any_webauth_path) === FALSE) {
-    // Create dir.
-    mkdir($any_webauth_path, 0755);
-    @chmod($any_webauth_path, 0775);
-  }
-
-  // Copy necessary check.php file over.
-  $default_redirect_file = drupal_get_path('module', 'wmd4') . '/anywebauth/anywebauth.php';
-  copy($default_redirect_file, $any_webauth_path . '/anywebauth.php');
-  chmod($any_webauth_path.'/anywebauth.php',0664);
-  // Copy .htaccess file to location.
-  $htaccess_file = drupal_get_path('module', 'wmd4') . '/anywebauth/htaccess.txt';
-  copy($htaccess_file, $any_webauth_path . '/.htaccess');
-  chmod($any_webauth_path.'/.htaccess',0664);
-
 }

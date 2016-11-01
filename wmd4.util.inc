@@ -185,23 +185,6 @@ function _wmd4_build_login_link() {
     return $wa_url;
 }
 
-/** 
- * helper function to create a webauth login link for any valid user
- * which simply goes through webauth and returns without creating a user
- * account in Drupal
- */ 
-function _wmd4_build_anywebauth_link() {
-    global $base_url;
-    $secure_base_url = str_replace('http:', 'https:', $base_url);
-    $webauth_url = $secure_base_url . '/sites/default/anywebauth/anywebauth.php';
-    $destination = drupal_get_destination();
-    $destination_url = $secure_base_url . '/' .$destination['destination'];
-    $options = array('attributes'=>array('class'=>array('button')),
-        'query'=>array('destination' => $destination_url));
-    return l('Authenticate with WebAuth', $webauth_url, $options);
-}
-
-
 /**
  * helper function to return login link in a Drupal form element
  */
