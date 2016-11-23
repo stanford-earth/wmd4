@@ -223,7 +223,7 @@ function _wmd4_get_ldap_variables() {
 
     $headers = array('Host'=>$_SERVER['HTTP_HOST'], 'Connection'=>'close', 'Accept'=>'*/*',
         'Cookie'=>'webauth_at='.urlencode($_COOKIE['webauth_at']));
-    $sock = drupal_http_request('https://'.$_SERVER['HTTP_HOST'].base_path().conf_path().'/webauth/check.php',$headers);
+    $sock = drupal_http_request('https://'.$_SERVER['HTTP_HOST'].base_path().conf_path().'/webauth/check.php',array('headers'=>$headers));
     if ($sock->code == 200) {
         $ldap_vars = array();
         foreach($sock->headers as $header => $value) {
